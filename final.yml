@@ -1,0 +1,30 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  become_user: root
+  pre_tasks:
+
+  - name: update repository index (CentOS)
+    tags: always
+    dnf:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "CentOS"
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Ubuntu"
+
+  - name: MOTD for the remote servers ssh connection
+    copy:
+      content: "Ansible Manage by Gabriel\n"
+      dest: /etc/motd
+
+- hosts: all
+  become: true
+  roles:
+    - install

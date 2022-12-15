@@ -1,0 +1,76 @@
+- name: install nagios in Ubuntu
+  apt:
+    name:
+      - nagios4
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: install nagios in CentOS
+  dnf:
+    name:
+      - nagios
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Installation of Prometheus for Ubuntu
+  tags: ubuntu, prometheus
+  apt:
+    name: prometheus
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Pre-req os installation for CentOS
+  tags: centos, snapd, epel-release
+  yum:
+    name:
+      - epel-release
+      - snapd
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: Enabling snapd sockets for CentOS
+  tags: snapd, centos
+  command: systemctl enable --now snapd.socket
+  when: ansible_distribution == "CentOS"
+
+- name: Installation of Prometheus for CentOS
+  tags: centos, prometheus
+  command: snap install prometheus --classic
+  when: ansible_distribution == "CentOS"
+
+
+- name: install apache and php for Ubuntu servers
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: install apache and php for CentOS servers
+  dnf:
+    name:
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: install mariadb package (CentOS)
+  yum:
+    name: mariadb-server
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: install mariadb package (Ubuntu)
+  apt:
+    name: mariadb-server
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: "Mariadb- Restarting/Enabling"
+  service:
+    name: mariadb
+    state: restarted
+    enabled: true
